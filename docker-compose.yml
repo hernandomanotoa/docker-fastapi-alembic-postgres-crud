@@ -11,8 +11,8 @@ services:
     ports:
       - 8004:8000
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/foo
-      # - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/foo
+      # - DATABASE_URL=postgresql://postgres:postgres@db:5432/foo
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/foo
     depends_on:
       - db
 
@@ -34,11 +34,11 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin # the password to login to pgadmin
     ports:
       - "5050:80"
-    volumes:
-      - ./server.json:/pgadmin4/server.json # preconfigured servers/connections
-      - ./pgpass:/pgpass # passwords for the connections in this file
-    depends_on:
-      - db
+  #   volumes:
+  #     - ./server.json:/pgadmin4/server.json # preconfigured servers/connections
+  #     - ./pgpass:/pgpass # passwords for the connections in this file
+  #   depends_on:
+  #     - db
   # cloudbeaver:
   #   image: dbeaver/cloudbeaver:latest
   #   container_name: dbeaver

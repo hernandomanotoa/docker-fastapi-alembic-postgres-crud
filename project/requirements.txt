@@ -4,3 +4,7 @@ fastapi
 psycopg2-binary
 sqlmodel
 uvicorn
+pyjwt
+faker
+python-jose
+passlib[bcrypt]
