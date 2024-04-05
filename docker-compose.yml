@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+
+  web:
+    build: ./project
+    container_name: web
+    command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8000
+    volumes:
+      - ./project:/usr/src/app
+    ports:
+      - 8004:8000
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/foo
+      # - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/foo
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15.3
+    container_name: db
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=foo  
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com #the username to login to pgadmin
+      PGADMIN_DEFAULT_PASSWORD: admin # the password to login to pgadmin
+    ports:
+      - "5050:80"
+    volumes:
+      - ./server.json:/pgadmin4/server.json # preconfigured servers/connections
+      - ./pgpass:/pgpass # passwords for the connections in this file
+    depends_on:
+      - db
+  # cloudbeaver:
+  #   image: dbeaver/cloudbeaver:latest
+  #   container_name: dbeaver
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8006:8978"
+  #   volumes:
+  #     - ./workspace:/opt/cloudbeaver/workspace
+  # pgadmin:
+  #   image: dpage/pgadmin4
+  #   container_name: pgadmin
+  #   ports:
+  #     - "8005:80"
+  #   depends_on:
+  #     - db
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: admin@admin.com
+  #     PGADMIN_DEFAULT_PASSWORD: admin
+  
+

@@ -1,0 +1,6 @@
+alembic
+asyncpg
+fastapi
+psycopg2-binary
+sqlmodel
+uvicorn
