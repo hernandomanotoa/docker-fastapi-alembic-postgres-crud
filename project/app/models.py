@@ -22,7 +22,15 @@ class UserBase(SQLModel):
     
 class User(UserBase, table=True):
     id: int = Field(default=None, primary_key=True)
-    # id: int = Field(default=None, nullable=False, primary_key=True)
     
 class UserCreate(UserBase):
     pass
+
+
+class Movie(SQLModel, table=True):
+    id: int = Field(default=None, primary_key=True)
+    title: str
+    overview: str
+    year: int
+    rating: float
+    category: str
