@@ -10,7 +10,7 @@ from alembic import context
 
 from app.models import Song                         # NEW
 from app.models import User                         # NEW
-# from app.models import Movie                         # NEW
+from app.models import Movie                         # NEW
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
