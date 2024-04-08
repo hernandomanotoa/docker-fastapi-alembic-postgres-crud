@@ -37,13 +37,13 @@ def message():
 #         token: str = create_token(user.dict())
 #         return JSONResponse(status_code=200, content=token)
 
-@app.get("/songs_add", tags=['songs'])
-async def add_songs(session: AsyncSession = Depends(get_session)):
-    for _ in range(10):  # Generar 10 registros de ejemplo
+@app.get("/songs_add/{numero}", tags=['songs'])
+async def add_songs(numero: int, session: AsyncSession = Depends(get_session)):
+    for _ in range(numero):  # Generar 10 registros de ejemplo
         new_song = Song(name=fake.catch_phrase(), artist=fake.name(), year=fake.random_int(min=2000, max=2024))
         session.add(new_song)
-    session.commit()
-    return JSONResponse(status_code=201, content={"message": "Se ha agregado 10 canciones"})
+    await session.commit()
+    return JSONResponse(status_code=201, content={"message": "Se ha agregado canciones: " + str(numero)})
 
 @app.get("/songs", tags=['songs'], response_model=list[Song])
 async def get_songs(session: AsyncSession = Depends(get_session)):
