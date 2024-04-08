@@ -55,8 +55,8 @@ async def get_songs(session: AsyncSession = Depends(get_session)):
 
 @app.get("/songs/{id}", tags=['songs'], response_model=list[Song])
 async def get_song(id: int, session: AsyncSession = Depends(get_session)):
-    result = await session.execute(select(Song).where(Song.id==id))
-    songs = result.scalars().all()
+    songs = await session.execute(select(Song).where(Song.id==id))
+    songs = songs.scalars().first()
     songs_data = [{"name": song.name, "artist": song.artist, "year": song.year, "id": song.id} for song in songs]
     return JSONResponse(status_code=200, content=songs_data)
 
@@ -69,27 +69,17 @@ async def add_song(song: SongCreate, session: AsyncSession = Depends(get_session
     return JSONResponse(status_code=201, content={"message": "Se ha registrado la canción"})
 
 @app.put("/songs/{id}", tags=['songs'])
-async def update_song(id: int, song: SongCreate, session: AsyncSession = Depends(get_session), status_code=200):
-    song_old=session.query(Song).filter(Song.id==id).first()
-    if song_old is None:
+async def update_song(id: int, song: SongCreate, session: AsyncSession = Depends(get_session)):
+    song_old = await session.execute(select(Song).where(Song.id==id))
+    song_old = song_old.scalars().first()
+    if song_old == None:
         return JSONResponse(status_code=404, content={"message": "Canción no encontrada no se puede actualizar"})
     song_old.name = song.name
     song_old.artist = song.artist
     song_old.year = song.year
     session.add(song_old)
-    session.commit()
+    await session.commit()
     return JSONResponse(status_code=200, content={"message": "Se ha modificado la canción"})
-
-
-    
-# @app.delete("/songs/{id}", tags=['songs'], status_code=200)
-# async def delete_song(id: int, session: AsyncSession = Depends(get_session)):
-#     song = await session.execute(select(Song).where(Song.id==id))
-#     if song is None:
-#         return JSONResponse(status_code=404, content={"message": "Canción no encontrada, no se puede eliminar"})
-#     await session.delete(song)
-#     await session.commit()
-#     return JSONResponse(status_code=200, content={"message": "Se ha eliminado la canción"})
 
 @app.delete("/songs/{id}", tags=['songs'], status_code=201)
 async def delete_song(id: int, session: AsyncSession = Depends(get_session)):
