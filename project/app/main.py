@@ -6,7 +6,7 @@ from fastapi.security import HTTPBearer
 from faker import Faker
 
 from app.db import get_session, init_db
-from app.models import Song, SongCreate, Movie
+from app.models import Song, SongCreate, Movie, MovieCreate
 # from app.jwt_manager import create_token, validate_token
 
 app = FastAPI()
@@ -37,7 +37,7 @@ def message():
 #         token: str = create_token(user.dict())
 #         return JSONResponse(status_code=200, content=token)
 
-@app.get("/songs_add/{numero}", tags=['songs'])
+@app.get("/songs_create/{numero}", tags=['songs'])
 async def add_songs(numero: int, session: AsyncSession = Depends(get_session)):
     for _ in range(numero):  # Generar 10 registros de ejemplo
         new_song = Song(name=fake.catch_phrase(), artist=fake.name(), year=fake.random_int(min=2000, max=2024))
@@ -96,8 +96,8 @@ async def delete_song(id: int, session: AsyncSession = Depends(get_session)):
         await session.commit()
         return JSONResponse(status_code=201, content={"message": "Se ha eliminado la canción"})
     
-@app.get("/movies_add/{numero}", tags=['movies'])
-async def add_songs(numero: int, session: AsyncSession = Depends(get_session)):
+@app.get("/movies_create/{numero}", tags=['movies'])
+async def add_movies(numero: int, session: AsyncSession = Depends(get_session)):
     for _ in range(numero):  # Generar 10 registros de ejemplo
         new_movie = Movie(title=fake.catch_phrase(), overview=fake.catch_phrase(), year=fake.random_int(min=2000, max=2024), rating=fake.random_int(min=1, max=10), category=fake.country())
         session.add(new_movie)
@@ -119,3 +119,39 @@ async def get_movie(id: int, session: AsyncSession = Depends(get_session)):
         return JSONResponse(status_code=201, content={"mensaje":"No se encuentra el item"})
     movies_data = [{"title": movie.title, "overview": movie.overview, "year": movie.year, "rating": movie.rating, "category": movie.category, "id": movie.id}]
     return JSONResponse(status_code=200, content=movies_data)
+
+@app.post("/movies", tags=['movies'])
+async def add_movie(movie: MovieCreate, session: AsyncSession = Depends(get_session)):
+    movie = Movie(title=movie.title, overview=movie.overview, year=movie.year, rating=movie.rating, category=movie.category)
+    session.add(movie)
+    await session.commit()
+    await session.refresh(movie)
+    return JSONResponse(status_code=201, content={"message": "Se ha registrado una pelicula"})
+
+@app.put("/movies/{id}", tags=['movies'])
+async def update_song(id: int, movie: MovieCreate, session: AsyncSession = Depends(get_session)):
+    movie_old = await session.execute(select(Movie).where(Movie.id==id))
+    movie_old = movie_old.scalars().first()
+    if movie_old == None:
+        return JSONResponse(status_code=404, content={"message": "Película no encontrada no se puede actualizar"})
+    movie_old.title = movie.title
+    movie_old.overview = movie.overview
+    movie_old.year = movie.year
+    movie_old.rating = movie.rating
+    movie_old.category = movie.category
+    session.add(movie_old)
+    await session.commit()
+    return JSONResponse(status_code=200, content={"message": "Se ha modificado la película"})
+
+@app.delete("/movies/{id}", tags=['movies'], status_code=201)
+async def delete_song(id: int, session: AsyncSession = Depends(get_session)):
+    movies = await session.execute(select(Movie).where(Movie.id==id))
+    movies = movies.scalars().first()
+    if movies == None:
+        return JSONResponse(status_code=201, content={"mensaje":"No se encuentra el item a eliminar"})
+    else:
+    # songs = result.scalars().one()
+        
+        await session.delete(movies)
+        await session.commit()
+        return JSONResponse(status_code=201, content={"message": "Se ha eliminado la película"})
