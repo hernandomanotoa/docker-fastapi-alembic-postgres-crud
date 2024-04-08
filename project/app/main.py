@@ -56,8 +56,10 @@ async def get_songs(session: AsyncSession = Depends(get_session)):
 @app.get("/songs/{id}", tags=['songs'], response_model=list[Song])
 async def get_song(id: int, session: AsyncSession = Depends(get_session)):
     songs = await session.execute(select(Song).where(Song.id==id))
-    songs = songs.scalars().first()
-    songs_data = [{"name": song.name, "artist": song.artist, "year": song.year, "id": song.id} for song in songs]
+    song = songs.scalars().first()
+    if song == None:
+        return JSONResponse(status_code=404, content={"message": "Canción no encontrada"})
+    songs_data = [{"name": song.name, "artist": song.artist, "year": song.year, "id": song.id}]
     return JSONResponse(status_code=200, content=songs_data)
 
 @app.post("/songs", tags=['songs'])
@@ -94,10 +96,26 @@ async def delete_song(id: int, session: AsyncSession = Depends(get_session)):
         await session.commit()
         return JSONResponse(status_code=201, content={"message": "Se ha eliminado la canción"})
     
-@app.get("/movies_add/{numero}", tags=['songs'])
+@app.get("/movies_add/{numero}", tags=['movies'])
 async def add_songs(numero: int, session: AsyncSession = Depends(get_session)):
     for _ in range(numero):  # Generar 10 registros de ejemplo
-        new_song = Movie(title=fake.catch_phrase(), overview=fake.catch_phrase(), year=fake.random_int(min=2000, max=2024), rating=fake.random_int(min=1, max=10), category=fake.country())
-        session.add(new_song)
+        new_movie = Movie(title=fake.catch_phrase(), overview=fake.catch_phrase(), year=fake.random_int(min=2000, max=2024), rating=fake.random_int(min=1, max=10), category=fake.country())
+        session.add(new_movie)
     await session.commit()
     return JSONResponse(status_code=201, content={"message": "Se ha agregado categorias: " + str(numero)})
+
+@app.get("/movies", tags=['movies'], response_model=list[Movie])
+async def get_movies(session: AsyncSession = Depends(get_session)):
+    result = await session.execute(select(Movie))
+    movies = result.scalars().all()
+    movies_data = [{"title": movie.title, "overview": movie.overview, "year": movie.year, "rating": movie.rating, "category": movie.category, "id": movie.id} for movie in movies]
+    return JSONResponse(status_code=200, content=movies_data)
+
+@app.get("/movies/{id}", tags=['movies'], response_model=list[Movie])
+async def get_movie(id: int, session: AsyncSession = Depends(get_session)):
+    movies = await session.execute(select(Movie).where(Movie.id==id))
+    movie = movies.scalars().first()
+    if movie == None:
+        return JSONResponse(status_code=201, content={"mensaje":"No se encuentra el item"})
+    movies_data = [{"title": movie.title, "overview": movie.overview, "year": movie.year, "rating": movie.rating, "category": movie.category, "id": movie.id}]
+    return JSONResponse(status_code=200, content=movies_data)
