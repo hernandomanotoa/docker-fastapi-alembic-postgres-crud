@@ -144,14 +144,14 @@ async def update_song(id: int, movie: MovieCreate, session: AsyncSession = Depen
     return JSONResponse(status_code=200, content={"message": "Se ha modificado la película"})
 
 @app.delete("/movies/{id}", tags=['movies'], status_code=201)
-async def delete_song(id: int, session: AsyncSession = Depends(get_session)):
-    movies = await session.execute(select(Movie).where(Movie.id==id))
-    movies = movies.scalars().first()
-    if movies == None:
+async def delete_movie(id: int, session: AsyncSession = Depends(get_session)):
+    movie = await session.execute(select(Movie).where(Movie.id==id))
+    movie = movie.scalars().first()
+    if movie == None:
         return JSONResponse(status_code=201, content={"mensaje":"No se encuentra el item a eliminar"})
     else:
     # songs = result.scalars().one()
-        
-        await session.delete(movies)
+        movies_data = [{"title": movie.title, "overview": movie.overview, "year": movie.year, "rating": movie.rating, "category": movie.category, "id": movie.id}]
+        await session.delete(movie)
         await session.commit()
-        return JSONResponse(status_code=201, content={"message": "Se ha eliminado la película"})
+        return JSONResponse(status_code=201, content={"message": "Se ha eliminado la película", "pelicula": movies_data})
