@@ -6,7 +6,7 @@ from fastapi.security import HTTPBearer
 from faker import Faker
 
 from app.db import get_session, init_db
-from app.models import Song, SongCreate, User, UserCreate
+from app.models import Song, SongCreate, Movie
 # from app.jwt_manager import create_token, validate_token
 
 app = FastAPI()
@@ -94,4 +94,10 @@ async def delete_song(id: int, session: AsyncSession = Depends(get_session)):
         await session.commit()
         return JSONResponse(status_code=201, content={"message": "Se ha eliminado la canción"})
     
-    
+@app.get("/movies_add/{numero}", tags=['songs'])
+async def add_songs(numero: int, session: AsyncSession = Depends(get_session)):
+    for _ in range(numero):  # Generar 10 registros de ejemplo
+        new_song = Movie(title=fake.catch_phrase(), overview=fake.catch_phrase(), year=fake.random_int(min=2000, max=2024), rating=fake.random_int(min=1, max=10), category=fake.country())
+        session.add(new_song)
+    await session.commit()
+    return JSONResponse(status_code=201, content={"message": "Se ha agregado categorias: " + str(numero)})
