@@ -61,6 +61,5 @@ async def delete_movie(id: int, session: AsyncSession = Depends(get_session)):
     if movie_old == None:
         return JSONResponse(status_code=404, content={"mensaje":"No se encuentra el item a eliminar"})
     else:
-        # movies_data = [{"title": movie.title, "overview": movie.overview, "year": movie.year, "rating": movie.rating, "category": movie.category, "id": movie.id}]
         movie_old = await MovieService(session).delete_movie(id)
         return JSONResponse(status_code=201, content={"message": "Se ha eliminado la película"})
