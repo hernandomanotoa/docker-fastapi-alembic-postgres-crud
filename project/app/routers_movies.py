@@ -8,11 +8,11 @@ from fastapi.encoders import jsonable_encoder
 from faker import Faker
 
 from app.db import get_session, init_db
-from app.models import Song, SongCreate, Movie, MovieCreate, UserCreate
+from app.models import Song, SongCreate, Movie, MovieCreate, UserCreate, User
 from app.error_handler import ErrorHandler
 from app.jwt_bearer import create_token, validate_token
 from app.models import Movie
-from app.services import MovieService
+from app.services_movies import MovieService
 from app.jwt_bearer import JWTBearer
 
 movie_router = APIRouter()

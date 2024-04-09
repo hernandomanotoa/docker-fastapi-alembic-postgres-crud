@@ -6,4 +6,4 @@ sqlmodel
 uvicorn
 faker
 pyjwt
-
+websocket

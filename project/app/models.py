@@ -17,7 +17,7 @@ class SongCreate(SongBase):
 
 class UserBase(SQLModel):
     email:str = Field(default="admin@admin.com")
-    password:str = Field(default="admin2")
+    password:str = Field(default="admin")
     # email:str
     # password:str
     
