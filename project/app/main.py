@@ -26,9 +26,3 @@ app.include_router(user_router)
 
 def message():
     return HTMLResponse('<h1>Bienvenido a fastapi</h1>')
-
-@app.post('/login', tags=['auth'])
-def login(user: UserCreate):
-    if user.email == "admin@admin.com" and user.password == "admin":
-        token: str = create_token(user.dict())
-        return JSONResponse(status_code=200, content=token)

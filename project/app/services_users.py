@@ -16,8 +16,9 @@ class UserService():
         result = users.scalars().first()
         return result
 
-    async def get_users_by_category(self, category):
-        result = self.db.query(User).filter(User.category == category).all()
+    async def get_users_by_email_password(self, data: UserCreate):
+        users = await self.db.execute(select(User).where(User.email==data.email and User.password==data.password))
+        result = users.scalars().first()
         return result
 
     async def create_user(self, user: User):
