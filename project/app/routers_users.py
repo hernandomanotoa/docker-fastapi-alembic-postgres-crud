@@ -6,8 +6,6 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.security import HTTPBearer
 from fastapi.encoders import jsonable_encoder
 from faker import Faker
-from fake_email import Email
-import bcrypt
 
 from app.db import get_session, init_db
 from app.models import User, UserCreate
